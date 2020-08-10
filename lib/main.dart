@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:wow_armory/api/blizzard_api_client.dart';
+import 'package:wow_armory/home/home_cubit.dart';
 import 'package:wow_armory/home/home_page.dart';
 
 final authClient = BlizzardAuthClient();
@@ -14,16 +16,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: Scaffold(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.red,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+        ),
+        home: Scaffold(
           appBar: AppBar(
             title: Text('WoW Bestiary'),
           ),
-          body: HomePage()),
-    );
+          body: BlocProvider<HomeCubit>(
+              create: (context) => HomeCubit(apiClient), child: HomePage()),
+        ));
   }
 }
