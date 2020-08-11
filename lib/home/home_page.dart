@@ -19,16 +19,11 @@ class HomePage extends StatelessWidget {
                       icon: Icon(Icons.search),
                     )),
                 Expanded(
-                    child: ListView(
-                        children: state.creatures
-                            .map((creature) => Center(
-                                  child: Text(
-                                    '${creature.data.name.enUs}',
-                                    style:
-                                        Theme.of(context).textTheme.headline5,
-                                  ),
-                                ))
-                            .toList())),
+                    child: ListView.builder(
+                        itemCount: state.cards.length,
+                        itemBuilder: (context, index) => ListTile(
+                              title: Text('${state.cards[index].name}'),
+                            ))),
               ],
             ));
   }

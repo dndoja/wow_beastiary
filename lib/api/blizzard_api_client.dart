@@ -1,6 +1,7 @@
 import 'dart:convert';
+
 import 'package:dio/dio.dart';
-import 'package:wow_armory/api/models/creature_search_result.dart';
+import 'package:wow_armory/api/card_search_result.dart';
 
 class BlizzardAuthClient {
   final Dio _dio = Dio();
@@ -11,13 +12,16 @@ class BlizzardAuthClient {
 
   Future<String> _getAuthenticationToken() async {
     final formData = FormData.fromMap({
-      "grant_type":"client_credentials",
+      "grant_type": "client_credentials",
       "client_id ": _identifier,
       "client_secret": _secret
     });
 
-    final basicAuth = 'Basic ' + base64Encode(utf8.encode('$_identifier:$_secret'));
-    final response = await _dio.post(_tokenEndpoint, data: formData, options: Options(headers: {"authorization":basicAuth}));
+    final basicAuth =
+        'Basic ' + base64Encode(utf8.encode('$_identifier:$_secret'));
+    final response = await _dio.post(_tokenEndpoint,
+        data: formData,
+        options: Options(headers: {"authorization": basicAuth}));
 
     return response.data["access_token"];
   }
@@ -35,31 +39,33 @@ class BlizzardApiClient {
   static const namespace = "static-eu";
   static const baseUrl = "https://eu.api.blizzard.com";
 
-  BlizzardApiClient(this._authClient){
+  BlizzardApiClient(this._authClient) {
     _addHeaderInterceptor();
     _addTokenRefreshingInterceptor();
   }
 
-  void _addHeaderInterceptor(){
-    _dio.interceptors.add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
+  void _addHeaderInterceptor() {
+    _dio.interceptors
+        .add(InterceptorsWrapper(onRequest: (RequestOptions options) async {
       var customHeaders = {
-        'Authorization': 'Bearer ${_authClient.token}'
+        'Authorization': 'Bearer ${_authClient.token}',
+        'Battlenet-Namespace': namespace
       };
       options.headers.addAll(customHeaders);
       return options;
     }));
   }
 
-  void _addTokenRefreshingInterceptor(){
+  void _addTokenRefreshingInterceptor() {
     _dio.interceptors.add(InterceptorsWrapper(onError: (error) async {
-      if(error.response?.statusCode==401){
+      if (error.response?.statusCode == 401) {
         final request = error.response.request;
         final bearerToken = 'Bearer ${_authClient.token}';
 
         // If the token has been updated, repeat directly.
-        if(bearerToken != request.headers["Authorization"]){
+        if (bearerToken != request.headers["Authorization"]) {
           request.headers["Authorization"] = bearerToken;
-          return  _dio.request(request.path, options: request);
+          return _dio.request(request.path, options: request);
         }
 
         // update token and repeat
@@ -67,10 +73,10 @@ class BlizzardApiClient {
         _dio.interceptors.requestLock.lock();
         _dio.interceptors.responseLock.lock();
 
-        return _authClient.refreshAuthenticationToken().whenComplete((){
+        return _authClient.refreshAuthenticationToken().whenComplete(() {
           _dio.interceptors.requestLock.unlock();
           _dio.interceptors.responseLock.unlock();
-        }).then((e){
+        }).then((e) {
           //repeat
           return _dio.request(request.path, options: request);
         });
@@ -79,13 +85,13 @@ class BlizzardApiClient {
     }));
   }
 
-  Future<CreatureSearchResult> searchCreatures({String creatureName = "", int page = 1}) async {
-    final response = await _dio.get('$baseUrl/data/wow/search/creature', queryParameters: {
-      "namespace": namespace,
-      "locale": "en_US",
-      "_page":page
-    });
-
-    return creatureSearchResultFromJson(response.data);
+  Future<CardSearchResult> searchCards({String creatureName = "", int page = 1}) async {
+      final response = await _dio.get('$baseUrl/hearthstone/cards', queryParameters: {
+        "namespace": namespace,
+        "locale": "en_US",
+        "page": page,
+      });
+      final cards = CardSearchResult.fromMap(response.data);
+      return cards;
   }
 }

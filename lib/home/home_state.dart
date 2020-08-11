@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
-import 'package:wow_armory/api/models/creature_search_result.dart';
+import 'package:wow_armory/api/card_search_result.dart';
 
 @immutable
 class HomeState {
-  HomeState.initial({this.creatures = const []});
-  HomeState.ofCreatures(this.creatures);
+  HomeState.initial({this.cards = const []});
+  HomeState.ofCards(this.cards);
 
-  final List<CreatureResult> creatures;
+  final List<Card> cards;
 }

@@ -5,11 +5,15 @@ import 'package:wow_armory/home/home_state.dart';
 class HomeCubit extends Cubit<HomeState> {
   final BlizzardApiClient _apiClient;
 
-  HomeCubit(this._apiClient) : super(HomeState.initial());
+  HomeCubit(this._apiClient) : super(HomeState.initial()) {
+    search('');
+  }
 
   void search(String query) {
     _apiClient
-        .searchCreatures(creatureName: query)
-        .then((value) => this.emit(HomeState.ofCreatures(value.results)));
+        .searchCards(creatureName: query)
+        .then((value) => print("po kari po brravo"))
+        .catchError((error) => print(error.toString()));
+        //.then((value) => print(value.toJson()));
   }
 }
