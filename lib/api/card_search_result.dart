@@ -12,7 +12,7 @@ class CardSearchResult {
     this.page,
   });
 
-  List<Card> cards;
+  List<HSCard> cards;
   int cardCount;
   int pageCount;
   int page;
@@ -24,7 +24,7 @@ class CardSearchResult {
 
   factory CardSearchResult.fromMap(Map<String, dynamic> json) =>
       CardSearchResult(
-        cards: List<Card>.from(json["cards"].map((x) => Card.fromMap(x))),
+        cards: List<HSCard>.from(json["cards"].map((x) => HSCard.fromMap(x))),
         cardCount: json["cardCount"],
         pageCount: json["pageCount"],
         page: json["page"],
@@ -38,8 +38,8 @@ class CardSearchResult {
       };
 }
 
-class Card {
-  Card({
+class HSCard {
+  HSCard({
     this.id,
     this.collectible,
     this.slug,
@@ -89,11 +89,11 @@ class Card {
   List<int> keywordIds;
   int durability;
 
-  factory Card.fromJson(String str) => Card.fromMap(json.decode(str));
+  factory HSCard.fromJson(String str) => HSCard.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
-  factory Card.fromMap(Map<String, dynamic> json) => Card(
+  factory HSCard.fromMap(Map<String, dynamic> json) => HSCard(
         id: json["id"],
         collectible: json["collectible"],
         slug: json["slug"],

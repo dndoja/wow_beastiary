@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:flutter/services.dart';
 import 'package:wow_armory/api/card_search_result.dart';
 
 class BlizzardAuthClient {
@@ -86,12 +87,8 @@ class BlizzardApiClient {
   }
 
   Future<CardSearchResult> searchCards({String creatureName = "", int page = 1}) async {
-      final response = await _dio.get('$baseUrl/hearthstone/cards', queryParameters: {
-        "namespace": namespace,
-        "locale": "en_US",
-        "page": page,
-      });
-      final cards = CardSearchResult.fromMap(response.data);
+      final response = await rootBundle.loadString('assets/cards.json');
+      final cards = CardSearchResult.fromJson(response);
       return cards;
   }
 }
